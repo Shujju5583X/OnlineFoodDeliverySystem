@@ -6,5 +6,5 @@ import java.util.Map;
 
 public interface OrderRepository {
     List<FoodItem> getMenu();
-    void placeOrder(Customer customer, Map<FoodItem, Integer> cart, double totalAmount);
+    int placeOrder(Customer customer, Map<FoodItem, Integer> cart, double totalAmount);
 }
