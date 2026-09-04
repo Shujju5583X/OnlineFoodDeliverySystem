@@ -1,69 +1,193 @@
-# Online Food Delivery System (TOMATO)
+# 🍕 Online Food Delivery System — TOMATO
 
-A robust, console-based Java application that simulates a complete food delivery platform. This project is built utilizing core Object-Oriented Programming (OOP) concepts, strictly adheres to SOLID design principles, and persists data using a MySQL database via raw JDBC.
+> A console-based Java application simulating a full-stack food delivery platform, built on solid OOP principles, the SOLID design philosophy, and MySQL persistence via raw JDBC.
 
-## Features
+---
 
-* **Multi-Role User System:** Supports different user types including `Admin`, `Customer`, `RestaurantOwner`, and `DeliveryPerson`.
+## ✨ Features
 
+| Feature | Description |
+|---|---|
+| 👥 **Multi-Role Users** | `Admin`, `Customer`, `RestaurantOwner`, `DeliveryPerson` each with dedicated flows |
+| 🔐 **Authentication** | Register and login with role-based access control |
+| 🛒 **Cart & Ordering** | Browse menus, add `FoodItem`s to a `Cart`, and place an `Order` |
+| 💳 **Payment Methods** | Pluggable payment system: `PaymentCard`, `PaymentCash`, `PaymentUPI` |
+| 🚴 **Delivery Tracking** | Assign orders to a `DeliveryPerson` and track delivery status |
+| 🍽️ **Restaurant Management** | Restaurant owners can add, edit, and remove menu items |
+| 🗄️ **JDBC Repository Pattern** | All CRUD operations go through typed repository interfaces backed by JDBC implementations |
 
-* **Authentication:** Secure user registration and login flows.
-* **Order Management:** Browse restaurant menus, add `FoodItem` objects to a `Cart`, and place an `Order`.
+---
 
+## 🗂️ Project Structure
 
-* **Payment Processing:** Interface-driven payment system supporting `PaymentCard`, `PaymentCash`, and `PaymentUPI`.
+```
+Online Food Delivery System/
+│
+├── src/
+│   ├── Main.java                  # Application entry point & interactive console UI
+│   ├── InsertMenu.java            # Utility to seed menu data
+│   │
+│   ├── config/
+│   │   └── DatabaseConfig.java    # MySQL connection constants (URL, USER, PASSWORD)
+│   │
+│   ├── model/                     # Core domain entities
+│   │   ├── User.java
+│   │   ├── Admin.java
+│   │   ├── Customer.java
+│   │   ├── RestaurantOwner.java
+│   │   ├── DeliveryPerson.java
+│   │   ├── Restaurant.java
+│   │   ├── FoodItem.java
+│   │   ├── Cart.java
+│   │   ├── Order.java
+│   │   ├── OrderItem.java
+│   │   ├── Delivery.java
+│   │   ├── Payment.java
+│   │   ├── PaymentCard.java
+│   │   ├── PaymentCash.java
+│   │   └── PaymentUPI.java
+│   │
+│   ├── interfaces/                # Abstraction contracts
+│   │
+│   ├── repository/                # Data access layer
+│   │   ├── UserRepository.java
+│   │   ├── JdbcUserRepository.java
+│   │   ├── OrderRepository.java
+│   │   ├── JdbcOrderRepository.java
+│   │   ├── DeliveryRepository.java
+│   │   └── JdbcDeliveryRepository.java
+│   │
+│   └── service/                   # Business logic layer
+│       ├── AuthenticationService.java
+│       ├── OrderService.java
+│       ├── PaymentService.java
+│       ├── DeliveryService.java
+│       └── RestaurantService.java
+│
+├── SQL/                           # Database schema and seed scripts
+├── mysql-connector-j-*.jar        # JDBC driver (not committed if .gitignore applied)
+└── Online_Food_Delivery_System_Project_Documentation.docx
+```
 
+---
 
-* **Delivery Tracking:** Assigns orders to a `DeliveryPerson` and tracks delivery status.
+## 🧱 Architecture
 
+The project follows a clean **layered architecture**:
 
-* **Database Integration:** Utilizes the Repository design pattern (e.g., `JdbcUserRepository`, `JdbcOrderRepository`) to perform CRUD operations via JDBC.
+```
+Console UI (Main.java)
+       ↓
+  Service Layer  ←→  Interfaces / Abstractions
+       ↓
+ Repository Layer (JDBC Implementations)
+       ↓
+  MySQL Database
+```
 
+- **Models** are plain Java POJOs with no DB or UI logic.
+- **Repositories** implement interfaces, making the data layer swappable.
+- **Services** orchestrate business rules and call repositories.
+- **`Main.java`** drives the console UI and wires everything together.
 
+---
 
-## Project Structure
+## 🛠️ Prerequisites
 
-The codebase is organized into highly cohesive packages to separate database logic from business rules:
+- **Java Development Kit (JDK)** — Version 8 or higher
+- **MySQL Server** — Installed and running locally
+- **MySQL Connector/J** — JDBC driver JAR (included as `mysql-connector-j-*.jar`)
+- **IDE** — IntelliJ IDEA recommended (`.iml` project file included)
 
-* **`src/config/`**: Contains `DatabaseConfig.java` for managing the MySQL database connection.
+---
 
+## 🚀 Setup & Running
 
-* **`src/model/`**: Holds core entities (`User`, `Customer`, `Restaurant`, `FoodItem`, `Order`, `Cart`, `Payment`, etc.).
+### 1. Clone the Repository
 
+```bash
+git clone <your-repo-url>
+cd "Online Food Delivery System"
+```
 
-* **`src/repository/`**: Contains repository interfaces and JDBC implementations for database interactions.
+### 2. Set Up the Database
 
+Run the SQL schema scripts located in the `SQL/` directory against your MySQL instance:
 
-* **`src/service/`**: Houses the business logic (`AuthenticationService`, `OrderService`, `PaymentService`, `DeliveryService`, `RestaurantService`).
+```sql
+-- Example (run via MySQL client or workbench)
+SOURCE SQL/schema.sql;
+```
 
+This creates the `food_delivery_db` database with tables:
+`users`, `customers`, `restaurants`, `food_items`, `orders`, `order_items`, `deliveries`
 
-* **`src/Main.java`**: The main entry point featuring an interactive console UI.
+### 3. Configure Database Credentials
 
+Open [`src/config/DatabaseConfig.java`](src/config/DatabaseConfig.java) and update:
 
+```java
+private static final String URL      = "jdbc:mysql://localhost:3306/food_delivery_db";
+private static final String USER     = "your_mysql_username";
+private static final String PASSWORD = "your_mysql_password";
+```
 
-## Prerequisites
+> ⚠️ **Never commit real credentials.** Consider adding `DatabaseConfig.java` to `.gitignore` and distributing a `DatabaseConfig.java.example` template instead.
 
-* **Java Development Kit (JDK):** Version 8 or higher.
-* **MySQL Server:** Installed and running locally.
-* **MySQL Connector/J:** The JDBC driver JAR file must be added to your project's classpath.
-* **IDE:** IntelliJ IDEA (the project contains an `.idea` directory) or any standard Java IDE.
+### 4. Add the JDBC Driver
 
+Ensure `mysql-connector-j-*.jar` is on your **classpath**:
+- **IntelliJ IDEA**: `File → Project Structure → Modules → Dependencies → + JAR`
 
+### 5. (Optional) Seed Menu Data
 
-## Setup Instructions
+Run `InsertMenu.java` once to populate sample restaurants and food items in the database.
 
-**1. Prepare the Database**
-Execute the provided SQL schema in your MySQL environment to create the `food_delivery_db` database and its corresponding tables (`users`, `customers`, `restaurants`, `food_items`, `orders`, `order_items`). Add sample restaurants and food items directly to the database so they appear in the menu.
+### 6. Run the Application
 
-**2. Configure Database Credentials**
-Navigate to `src/config/DatabaseConfig.java` and update the `URL`, `USER`, and `PASSWORD` constants to match your local MySQL configuration.
+Compile and execute `src/Main.java`. The console will guide you through:
 
-**3. Add the JDBC Driver**
-Ensure the `mysql-connector-j-x.x.x.jar` file is downloaded and added to your project's build path/dependencies.
+- Registering / logging in as any role
+- Browsing restaurant menus
+- Adding items to your cart and placing an order
+- Processing payment (Card / Cash / UPI)
+- Tracking delivery status
 
-**4. Run the Application**
-Compile and execute `src/Main.java`. Use the console prompts to register a new customer, log in, browse the menu, and place an order.
+---
 
-## Documentation
+## 🗃️ Database Schema (Overview)
 
-For extended details on project architecture and UML diagrams, refer to the included `Online_Food_Delivery_System_Project_Documentation.docx` file.
+| Table | Key Columns |
+|---|---|
+| `users` | `id`, `name`, `email`, `password`, `role` |
+| `customers` | `id`, `user_id`, `address` |
+| `restaurants` | `id`, `owner_id`, `name`, `address` |
+| `food_items` | `id`, `restaurant_id`, `name`, `price`, `available` |
+| `orders` | `id`, `customer_id`, `restaurant_id`, `status`, `total` |
+| `order_items` | `id`, `order_id`, `food_item_id`, `quantity`, `price` |
+| `deliveries` | `id`, `order_id`, `delivery_person_id`, `status` |
+
+---
+
+## 📐 Design Principles
+
+- **OOP**: Inheritance (`User → Customer`, `Payment → PaymentCard`), Encapsulation, Polymorphism
+- **SOLID**: Single Responsibility (one class, one job), Open/Closed (extend services, not modify), Dependency Inversion (depend on interfaces)
+- **Repository Pattern**: Decouples business logic from data access; implementations can be swapped (e.g., in-memory for tests)
+
+---
+
+## 📄 Documentation
+
+Extended architecture notes and UML diagrams are in:
+[`Online_Food_Delivery_System_Project_Documentation.docx`](Online_Food_Delivery_System_Project_Documentation.docx)
+
+---
+
+## 👤 Author
+
+**Shujatullah** — built as a Java OOP & JDBC learning project.
+
+---
+
+*TOMATO — Because every great food app needs a great name 🍅*

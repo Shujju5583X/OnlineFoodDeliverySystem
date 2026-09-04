@@ -1,24 +1,26 @@
 package service;
 import model.User;
-import java.util.ArrayList;
-import java.util.List;
+import repository.UserRepository;
 
 public class AuthenticationService {
-    private List<User> usersDatabase = new ArrayList<>();
+    private UserRepository userRepository;
+
+    public AuthenticationService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public void registerUser(User user) {
-        usersDatabase.add(user);
-        System.out.println(user.getName() + " registered successfully.");
+        userRepository.save(user);
+        System.out.println(user.getName() + " registration attempted.");
     }
 
     public User login(String email, String password) {
-        for (User user : usersDatabase) {
-            if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                System.out.println("Login successful for: " + user.getName());
-                return user;
-            }
+        User user = userRepository.login(email, password);
+        if (user != null) {
+            System.out.println("Login successful for: " + user.getName());
+        } else {
+            System.out.println("Invalid credentials.");
         }
-        System.out.println("Invalid credentials.");
-        return null;
+        return user;
     }
 }

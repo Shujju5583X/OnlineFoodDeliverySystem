@@ -1,32 +1,51 @@
 package service;
 import model.*;
-import java.util.ArrayList;
+import repository.OrderRepository;
+import java.util.List;
+import java.util.Map;
 
 public class OrderService {
-    private int orderCounter = 1;
+    private OrderRepository orderRepository;
     private PaymentService paymentService;
 
-    public OrderService(PaymentService paymentService) {
+    public OrderService(OrderRepository orderRepository, PaymentService paymentService) {
+        this.orderRepository = orderRepository;
         this.paymentService = paymentService;
     }
 
-    public Order placeOrder(Customer customer, Restaurant restaurant, Cart cart, Payment payment) {
-        if (cart.getItems().isEmpty()) {
+    public List<FoodItem> getMenu() {
+        return orderRepository.getMenu();
+    }
+
+    public List<FoodItem> getAllMenuItems() {
+        return orderRepository.getAllMenuItems();
+    }
+
+    public boolean addMenuItem(String name, double price, String description) {
+        return orderRepository.addMenuItem(name, price, description);
+    }
+
+    public boolean updateMenuItem(int itemId, String newName, double newPrice, String newDescription, boolean isAvailable) {
+        return orderRepository.updateMenuItem(itemId, newName, newPrice, newDescription, isAvailable);
+    }
+
+    public boolean deleteMenuItem(int itemId) {
+        return orderRepository.deleteMenuItem(itemId);
+    }
+
+    public int placeOrder(Customer customer, Map<FoodItem, Integer> cart, double total, Payment payment) {
+        if (cart.isEmpty()) {
             System.out.println("Cart is empty!");
-            return null;
+            return -1;
         }
 
-        double total = cart.calculateTotal();
         boolean isPaid = paymentService.executePayment(payment);
 
         if (isPaid) {
-            Order order = new Order(orderCounter++, customer, restaurant, new ArrayList<>(cart.getItems()), total);
-            cart.clearCart();
-            System.out.println("Order " + order.getOrderId() + " placed successfully!");
-            return order;
+            return orderRepository.placeOrder(customer, cart, total);
         }
 
         System.out.println("Payment failed. Order not placed.");
-        return null;
+        return -1;
     }
 }

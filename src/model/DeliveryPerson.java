@@ -17,4 +17,5 @@ public class DeliveryPerson extends User {
 
     public boolean isAvailable() { return isAvailable; }
     public void setAvailable(boolean available) { isAvailable = available; }
+    public String getVehicleNumber() { return vehicleNumber; }
 }

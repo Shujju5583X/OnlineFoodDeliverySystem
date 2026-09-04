@@ -1,10 +1,17 @@
-### IntelliJ IDEA ###
+# =============================
+# IntelliJ IDEA
+# =============================
+.idea/
+*.iml
+*.iws
+*.ipr
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-.kotlin
 
-### Eclipse ###
+# =============================
+# Eclipse
+# =============================
 .apt_generated
 .classpath
 .factorypath
@@ -16,15 +23,67 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-### NetBeans ###
+# =============================
+# NetBeans
+# =============================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
+# =============================
+# VS Code
+# =============================
 .vscode/
 
-### Mac OS ###
+# =============================
+# Java Compilation Output
+# =============================
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+
+# =============================
+# Database Credentials & Config
+# =============================
+# Never commit real DB credentials!
+# Copy src/config/DatabaseConfig.java.example and fill in your own values.
+src/config/DatabaseConfig.java
+
+# =============================
+# Build Tools
+# =============================
+target/
+build/
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# =============================
+# Logs & Temp Files
+# =============================
+*.log
+*.tmp
+*.swp
+*~
+
+# =============================
+# OS Generated Files
+# =============================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# =============================
+# Kotlin (if ever added)
+# =============================
+.kotlin/

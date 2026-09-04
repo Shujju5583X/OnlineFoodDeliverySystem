@@ -1,21 +1,23 @@
 package service;
-import model.Delivery;
 import model.DeliveryPerson;
-import model.Order;
-import java.util.List;
+import repository.DeliveryRepository;
 
 public class DeliveryService {
-    private int deliveryCounter = 1;
+    private DeliveryRepository deliveryRepository;
 
-    public Delivery assignDeliveryPerson(Order order, List<DeliveryPerson> drivers) {
-        for (DeliveryPerson driver : drivers) {
-            if (driver.isAvailable()) {
-                driver.setAvailable(false);
-                System.out.println("Driver " + driver.getName() + " assigned to Order " + order.getOrderId());
-                return new Delivery(deliveryCounter++, order, driver);
-            }
-        }
-        System.out.println("No delivery persons available.");
-        return null;
+    public DeliveryService(DeliveryRepository deliveryRepository) {
+        this.deliveryRepository = deliveryRepository;
+    }
+
+    public DeliveryPerson findAvailableDriver() {
+        return deliveryRepository.findAvailableDriver();
+    }
+
+    public void assignDelivery(int orderId, int driverId) {
+        deliveryRepository.assignDelivery(orderId, driverId);
+    }
+
+    public void completeDelivery(int driverId) {
+        deliveryRepository.completeDelivery(driverId);
     }
 }

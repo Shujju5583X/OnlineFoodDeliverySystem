@@ -12,6 +12,7 @@ public class JdbcUserRepository implements UserRepository {
     public void save(User user) {
         String insertUser = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
         String insertCustomer = "INSERT INTO customers (user_id, address, phone_number) VALUES (?, ?, ?)";
+        String insertDelivery = "INSERT INTO delivery_persons (user_id, vehicle_number, is_available) VALUES (?, ?, TRUE)";
 
         try (Connection conn = DatabaseConfig.getConnection()) {
             conn.setAutoCommit(false);
@@ -20,19 +21,33 @@ public class JdbcUserRepository implements UserRepository {
                 userStmt.setString(1, user.getName());
                 userStmt.setString(2, user.getEmail());
                 userStmt.setString(3, user.getPassword());
-                userStmt.setString(4, "CUSTOMER");
+
+                String role = "CUSTOMER";
+                if (user instanceof DeliveryPerson) role = "DELIVERY_PERSON";
+                else if (user instanceof model.RestaurantOwner) role = "RESTAURANT_OWNER";
+                else if (user instanceof model.Admin) role = "ADMIN";
+
+                userStmt.setString(4, role);
                 userStmt.executeUpdate();
 
                 ResultSet keys = userStmt.getGeneratedKeys();
-                if (keys.next() && user instanceof Customer) {
+                if (keys.next()) {
                     int userId = keys.getInt(1);
-                    Customer c = (Customer) user;
-
-                    try (PreparedStatement custStmt = conn.prepareStatement(insertCustomer)) {
-                        custStmt.setInt(1, userId);
-                        custStmt.setString(2, c.getAddress());
-                        custStmt.setString(3, c.getPhoneNumber());
-                        custStmt.executeUpdate();
+                    if (user instanceof Customer) {
+                        Customer c = (Customer) user;
+                        try (PreparedStatement custStmt = conn.prepareStatement(insertCustomer)) {
+                            custStmt.setInt(1, userId);
+                            custStmt.setString(2, c.getAddress());
+                            custStmt.setString(3, c.getPhoneNumber());
+                            custStmt.executeUpdate();
+                        }
+                    } else if (user instanceof DeliveryPerson) {
+                        DeliveryPerson d = (DeliveryPerson) user;
+                        try (PreparedStatement delStmt = conn.prepareStatement(insertDelivery)) {
+                            delStmt.setInt(1, userId);
+                            delStmt.setString(2, d.getVehicleNumber());
+                            delStmt.executeUpdate();
+                        }
                     }
                 }
                 conn.commit();
@@ -65,6 +80,10 @@ public class JdbcUserRepository implements UserRepository {
                 } else if ("DELIVERY_PERSON".equals(role)) {
                     return new DeliveryPerson(rs.getInt("user_id"), rs.getString("name"), rs.getString("email"),
                             rs.getString("password"), rs.getString("vehicle_number"));
+                } else if ("ADMIN".equals(role)) {
+                    return new model.Admin(rs.getInt("user_id"), rs.getString("name"), rs.getString("email"), rs.getString("password"));
+                } else if ("RESTAURANT_OWNER".equals(role)) {
+                    return new model.RestaurantOwner(rs.getInt("user_id"), rs.getString("name"), rs.getString("email"), rs.getString("password"));
                 }
             }
         } catch (SQLException e) { e.printStackTrace(); }
